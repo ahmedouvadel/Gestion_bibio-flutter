@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "85381321443",
+    "firebase_url": "https://temo-ff-default-rtdb.firebaseio.com",
+    "project_id": "temo-ff",
+    "storage_bucket": "temo-ff.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:85381321443:android:84fa825c11b5b5345debd6",
+        "android_client_info": {
+          "package_name": "com.example.firebase_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "85381321443-god3ek75d8gi51kabl22mk06v6mj9k53.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPoJ0OIBuLbcYzi0lzlHn58eEoNwuEZ8U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "85381321443-god3ek75d8gi51kabl22mk06v6mj9k53.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:85381321443:android:58de9ace027a60fd5debd6",
+        "android_client_info": {
+          "package_name": "com.example.gestion_bibliotheque"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "85381321443-god3ek75d8gi51kabl22mk06v6mj9k53.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPoJ0OIBuLbcYzi0lzlHn58eEoNwuEZ8U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "85381321443-god3ek75d8gi51kabl22mk06v6mj9k53.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
