@@ -11,34 +11,47 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
+        title: const Text('Gestion de Bibliothèque'),
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            // En-tête du Drawer
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Colors.green,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    'Menu',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+            // En-tête du Drawer avec courbe
+            SizedBox(
+              height: 160,
+              child: Stack(
+                children: [
+                  ClipPath(
+                    clipper: DrawerHeaderClipper(),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.green,
+                      ),
                     ),
                   ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Explore our features!',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Menu',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          'Explore our features!',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -107,15 +120,21 @@ class HomeScreen extends StatelessWidget {
               title: const Text('Settings'),
               onTap: () {},
             ),
-            ListTile(
-              title: Row(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text('Terms'),
-                  Text('Privacy'),
+                children: [
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text('Terms'),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text('Privacy'),
+                  ),
                 ],
               ),
-              onTap: () {},
             ),
           ],
         ),
@@ -125,4 +144,21 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+// ClipPath personnalisé pour la courbe
+class DrawerHeaderClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height - 20);
+    path.quadraticBezierTo(
+        size.width / 2, size.height, size.width, size.height - 20);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
