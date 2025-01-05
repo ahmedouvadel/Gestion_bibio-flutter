@@ -11,7 +11,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gestion de Bibliothèque'),
+        title: const Text(''),
       ),
       drawer: Drawer(
         child: ListView(
@@ -45,7 +45,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          'Explore our features!',
+                          'Découvrez nos fonctionnalités!',
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 14,
@@ -68,7 +68,7 @@ class HomeScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.book),
-              title: const Text('Our Books'),
+              title: const Text('Nos livres'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -78,7 +78,7 @@ class HomeScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('Our auteurs'),
+              title: const Text('Nos auteurs'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -89,27 +89,27 @@ class HomeScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.work),
-              title: const Text('Careers'),
+              title: const Text('Carrières'),
               onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.attach_money),
-              title: const Text('Sell With Us'),
+              title: const Text('Vendez avec nous'),
               onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.newspaper),
-              title: const Text('Newsletter'),
+              title: const Text('Bulletin'),
               onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.edit),
-              title: const Text('Pop-up Leasing'),
+              title: const Text('Location éphémère'),
               onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.account_circle),
-              title: const Text('Account'),
+              title: const Text('Compte'),
               onTap: () {},
             ),
 
@@ -117,7 +117,7 @@ class HomeScreen extends StatelessWidget {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
+              title: const Text('Paramètres'),
               onTap: () {},
             ),
             Padding(
@@ -131,7 +131,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {},
-                    child: const Text('Privacy'),
+                    child: const Text('Confidentialité'),
                   ),
                 ],
               ),

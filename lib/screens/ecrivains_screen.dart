@@ -16,8 +16,59 @@ class _EcrivainsScreenState extends State<EcrivainsScreen> {
   final TextEditingController _nomController = TextEditingController();
   final TextEditingController _prenomController = TextEditingController();
   final TextEditingController _telController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
-  String? _currentId; // Pour identifier l'écrivain sélectionné
+  String? _currentId;
+  List<Ecrivain> _ecrivains = [];
+  List<Ecrivain> _filteredEcrivains = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEcrivains();
+  }
+
+  // Récupérer les écrivains depuis la base de données
+  void _fetchEcrivains() {
+    _ecrivainService.obtenirEcrivains().listen((event) {
+      if (event.snapshot.value != null) {
+        final Map<dynamic, dynamic> data =
+            event.snapshot.value as Map<dynamic, dynamic>;
+        final ecrivains = data.entries.map((entry) {
+          final ecrivainData = Map<String, dynamic>.from(entry.value);
+          return Ecrivain(
+            id: entry.key,
+            nom: ecrivainData['nom'],
+            prenom: ecrivainData['prenom'],
+            tel: ecrivainData['tel'],
+          );
+        }).toList();
+
+        setState(() {
+          _ecrivains = ecrivains;
+          _filteredEcrivains = ecrivains; // Liste filtrée initiale
+        });
+      } else {
+        setState(() {
+          _ecrivains = [];
+          _filteredEcrivains = [];
+        });
+      }
+    });
+  }
+
+  // Recherche par nom, prénom ou téléphone
+  void _searchEcrivains(String query) {
+    setState(() {
+      _filteredEcrivains = _ecrivains.where((ecrivain) {
+        final fullName =
+            '${ecrivain.nom.toLowerCase()} ${ecrivain.prenom.toLowerCase()}';
+        final tel = ecrivain.tel.toLowerCase();
+        final searchLower = query.toLowerCase();
+        return fullName.contains(searchLower) || tel.contains(searchLower);
+      }).toList();
+    });
+  }
 
   // Ajouter ou modifier un écrivain
   void ajouterOuModifierEcrivain() {
@@ -34,16 +85,14 @@ class _EcrivainsScreenState extends State<EcrivainsScreen> {
       );
 
       if (_currentId == null) {
-        // Ajouter un nouvel écrivain
         _ecrivainService.ajouterEcrivain(ecrivain.toMap()).then((_) {
-          Navigator.pop(context); // Fermer le dialogue après l'ajout
+          Navigator.pop(context);
         });
       } else {
-        // Modifier l'écrivain existant
         _ecrivainService
             .mettreAJourEcrivain(_currentId!, ecrivain.toMap())
             .then((_) {
-          Navigator.pop(context); // Fermer le dialogue après la mise à jour
+          Navigator.pop(context);
         });
       }
     } else {
@@ -65,17 +114,15 @@ class _EcrivainsScreenState extends State<EcrivainsScreen> {
     }
   }
 
-  // Afficher la boîte de dialogue pour ajouter/modifier un écrivain
+  // Boîte de dialogue pour ajouter/modifier un écrivain
   void afficherDialogueAjoutOuModification(BuildContext context,
       {Ecrivain? ecrivain}) {
     if (ecrivain != null) {
-      // Pré-remplir les champs pour la modification
       _nomController.text = ecrivain.nom;
       _prenomController.text = ecrivain.prenom;
       _telController.text = ecrivain.tel;
       _currentId = ecrivain.id;
     } else {
-      // Réinitialiser pour l'ajout
       _nomController.clear();
       _prenomController.clear();
       _telController.clear();
@@ -86,34 +133,98 @@ class _EcrivainsScreenState extends State<EcrivainsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(ecrivain == null
-              ? 'Ajouter un Écrivain'
-              : 'Modifier un Écrivain'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16), // Coins arrondis
+          ),
+          title: Row(
             children: [
-              TextField(
-                controller: _nomController,
-                decoration: const InputDecoration(labelText: 'Nom'),
+              Icon(
+                ecrivain == null
+                    ? Icons.person_add
+                    : Icons.edit, // Icône dynamique
+                color: Colors.green,
               ),
-              TextField(
-                controller: _prenomController,
-                decoration: const InputDecoration(labelText: 'Prénom'),
-              ),
-              TextField(
-                controller: _telController,
-                decoration: const InputDecoration(labelText: 'Téléphone'),
-                keyboardType: TextInputType.phone,
+              const SizedBox(width: 8), // Espacement
+              Text(
+                ecrivain == null
+                    ? 'Ajouter un Écrivain'
+                    : 'Modifier un Écrivain',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Nom
+                TextField(
+                  controller: _nomController,
+                  decoration: InputDecoration(
+                    labelText: 'Nom',
+                    prefixIcon: const Icon(Icons.person), // Icône pour le nom
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12), // Espacement
+
+                // Prénom
+                TextField(
+                  controller: _prenomController,
+                  decoration: InputDecoration(
+                    labelText: 'Prénom',
+                    prefixIcon:
+                        const Icon(Icons.person_outline), // Icône pour prénom
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Téléphone
+                TextField(
+                  controller: _telController,
+                  decoration: InputDecoration(
+                    labelText: 'Téléphone',
+                    prefixIcon: const Icon(Icons.phone), // Icône pour téléphone
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  keyboardType: TextInputType.phone,
+                ),
+              ],
+            ),
+          ),
           actions: [
-            TextButton(
-              child: const Text('Annuler'),
+            // Bouton Annuler
+            TextButton.icon(
+              icon:
+                  const Icon(Icons.cancel, color: Colors.red), // Icône annulée
+              label: const Text('Annuler'),
               onPressed: () => Navigator.pop(context),
             ),
-            TextButton(
-              child: Text(ecrivain == null ? 'Ajouter' : 'Modifier'),
+
+            // Bouton Ajouter ou Modifier
+            ElevatedButton.icon(
+              icon: Icon(
+                ecrivain == null ? Icons.add : Icons.edit, // Icône dynamique
+                color: Colors.white,
+              ),
+              label: Text(ecrivain == null ? 'Ajouter' : 'Modifier'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    Colors.green, // Couleur verte pour correspondre au thème
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               onPressed: ajouterOuModifierEcrivain,
             ),
           ],
@@ -128,57 +239,65 @@ class _EcrivainsScreenState extends State<EcrivainsScreen> {
       appBar: AppBar(
         title: const Text('Liste des Écrivains'),
       ),
-      body: StreamBuilder<DatabaseEvent>(
-        stream: _ecrivainService.obtenirEcrivains(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final Map<dynamic, dynamic> data =
-              snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
-          final ecrivains = data.entries.map((entry) {
-            final ecrivainData = Map<String, dynamic>.from(entry.value);
-            return Ecrivain(
-              id: entry.key,
-              nom: ecrivainData['nom'],
-              prenom: ecrivainData['prenom'],
-              tel: ecrivainData['tel'],
-            );
-          }).toList();
-
-          return ListView.builder(
-            itemCount: ecrivains.length,
-            itemBuilder: (context, index) {
-              final ecrivain = ecrivains[index];
-              return ListTile(
-                title: Text('${ecrivain.nom} ${ecrivain.prenom}'),
-                subtitle: Text(ecrivain.tel),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () => afficherDialogueAjoutOuModification(
-                          context,
-                          ecrivain: ecrivain),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => _ecrivainService.supprimerEcrivain(
-                        ecrivain.id,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.phone),
-                      onPressed: () => appelerEcrivain(ecrivain.tel),
-                    ),
-                  ],
+      body: Column(
+        children: [
+          // Barre de recherche
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Rechercher par nom ou téléphone...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              );
-            },
-          );
-        },
+              ),
+              onChanged: _searchEcrivains,
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _filteredEcrivains.length,
+              itemBuilder: (context, index) {
+                final ecrivain = _filteredEcrivains[index];
+                return Card(
+                  elevation: 4,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    title: Text('${ecrivain.nom} ${ecrivain.prenom}'),
+                    subtitle: Text(ecrivain.tel),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.phone, color: Colors.green),
+                          onPressed: () => appelerEcrivain(ecrivain.tel),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () => afficherDialogueAjoutOuModification(
+                              context,
+                              ecrivain: ecrivain),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _ecrivainService.supprimerEcrivain(
+                            ecrivain.id,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => afficherDialogueAjoutOuModification(context),

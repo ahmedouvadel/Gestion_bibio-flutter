@@ -64,7 +64,7 @@ class LivreDetailsScreen extends StatelessWidget {
                     // ISBN
                     Row(
                       children: [
-                        const Icon(Icons.code, color: Colors.green),
+                        const Icon(Icons.code, color: Colors.cyan),
                         const SizedBox(width: 8),
                         Text(
                           'ISBN: ${livre.isbn}',
@@ -77,7 +77,7 @@ class LivreDetailsScreen extends StatelessWidget {
                     // Date de sortie
                     Row(
                       children: [
-                        const Icon(Icons.date_range, color: Colors.green),
+                        const Icon(Icons.date_range, color: Colors.cyan),
                         const SizedBox(width: 8),
                         Text(
                           'Date de Sortie: ${livre.dateSortie}',
@@ -90,7 +90,7 @@ class LivreDetailsScreen extends StatelessWidget {
                     // ID de l'écrivain
                     Row(
                       children: [
-                        const Icon(Icons.person, color: Colors.green),
+                        const Icon(Icons.person, color: Colors.cyan),
                         const SizedBox(width: 8),
                         Text(
                           'ID Écrivain: ${livre.ecrivainId}',

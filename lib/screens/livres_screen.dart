@@ -23,7 +23,6 @@ class _LivresScreenState extends State<LivresScreen> {
   File? _imageFile;
   String? _currentKey;
 
-  // Sélectionner une image
   Future<void> _selectImage() async {
     final image = await _imageService.selectImage();
     if (image != null) {
@@ -53,7 +52,7 @@ class _LivresScreenState extends State<LivresScreen> {
           titre: titre,
           isbn: isbn,
           dateSortie: dateSortie,
-          photo: imagePath, // Utiliser le chemin local
+          photo: imagePath,
           ecrivainId: ecrivainId,
         );
 
@@ -106,34 +105,53 @@ class _LivresScreenState extends State<LivresScreen> {
             itemCount: livres.length,
             itemBuilder: (context, index) {
               final livre = livres[index];
-              return ListTile(
-                title: Text(livre.titre),
-                subtitle:
-                    Text('ISBN: ${livre.isbn}\nDate: ${livre.dateSortie}'),
-                leading: Image.file(
-                  File(livre.photo),
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
+              return Card(
+                elevation: 4,
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () =>
-                          _afficherDialogueModification(context, livre),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.all(12),
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(
+                      File(livre.photo),
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () async {
-                        await _livreService.supprimerLivre(livre.id);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Livre supprimé !')),
-                        );
-                      },
+                  ),
+                  title: Text(
+                    livre.titre,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
-                  ],
+                  ),
+                  subtitle: Text(
+                    'ISBN: ${livre.isbn}\nDate: ${livre.dateSortie}',
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () =>
+                            _afficherDialogueModification(context, livre),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () async {
+                          await _livreService.supprimerLivre(livre.id);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Livre supprimé !')),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -142,7 +160,8 @@ class _LivresScreenState extends State<LivresScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _afficherDialogueAjout(context),
-        child: const Icon(Icons.add),
+        backgroundColor: Colors.green,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
@@ -168,54 +187,66 @@ class _LivresScreenState extends State<LivresScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Ajouter/Modifier un Livre'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              const Icon(Icons.book, color: Colors.green),
+              const SizedBox(width: 8),
+              const Text(
+                'Ajouter/Modifier Livre',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
           content: SingleChildScrollView(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(
-                  controller: _titreController,
-                  decoration: const InputDecoration(labelText: 'Titre'),
-                ),
-                TextField(
-                  controller: _isbnController,
-                  decoration: const InputDecoration(labelText: 'ISBN'),
-                ),
-                TextField(
-                  controller: _dateSortieController,
-                  decoration:
-                      const InputDecoration(labelText: 'Date de Sortie'),
-                ),
-                TextButton(
+                _buildTextField(_titreController, 'Titre', Icons.title),
+                _buildTextField(_isbnController, 'ISBN', Icons.code),
+                _buildTextField(
+                    _dateSortieController, 'Date de Sortie', Icons.date_range),
+                _buildTextField(
+                    _ecrivainIdController, 'ID Écrivain', Icons.person_outline),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.image),
+                  label: const Text('Sélectionner une image'),
                   onPressed: _selectImage,
-                  child: _imageFile == null
-                      ? const Text('Sélectionner une image')
-                      : Image.file(
-                          _imageFile!,
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        ),
-                ),
-                TextField(
-                  controller: _ecrivainIdController,
-                  decoration: const InputDecoration(labelText: 'ID Écrivain'),
                 ),
               ],
             ),
           ),
           actions: [
             TextButton(
-              child: const Text('Annuler'),
               onPressed: () => Navigator.pop(context),
+              child: const Text('Annuler'),
             ),
-            TextButton(
-              child: const Text('Enregistrer'),
+            ElevatedButton(
               onPressed: ajouterOuModifierLivre,
+              child: const Text('Enregistrer'),
             ),
           ],
         );
       },
     );
   }
+}
+
+Widget _buildTextField(
+    TextEditingController controller, String label, IconData icon) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon), // Icône avant le texte
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12), // Coins arrondis
+        ),
+      ),
+    ),
+  );
 }

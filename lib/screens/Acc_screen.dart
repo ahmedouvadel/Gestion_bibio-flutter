@@ -45,7 +45,7 @@ class _AccScreenState extends State<AccScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gestion de Bibliothèque'),
+        title: const Text('Choisissez un livre'),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -69,7 +69,7 @@ class _AccScreenState extends State<AccScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Our Top Picks",
+                  "Nos meilleurs choix",
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -140,7 +140,7 @@ class _AccScreenState extends State<AccScreen> {
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: Text(
-              "Bestsellers",
+              "Meilleures ventes",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -205,13 +205,13 @@ class _AccScreenState extends State<AccScreen> {
                                   Expanded(
                                     child: ElevatedButton(
                                       onPressed: () {},
-                                      child: const Text('Add to cart'),
+                                      child: const Text('ajouter'),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   OutlinedButton(
                                     onPressed: () {},
-                                    child: const Text('Wishlist'),
+                                    child: const Text('Liste de souhaits'),
                                   ),
                                 ],
                               ),
