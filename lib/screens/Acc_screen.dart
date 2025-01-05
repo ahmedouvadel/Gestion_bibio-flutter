@@ -3,6 +3,7 @@ import 'dart:io';
 import '../models/livre.dart';
 import '../services/livre_service.dart';
 import 'livre_details.dart';
+import 'livre_search.dart';
 
 class AccScreen extends StatefulWidget {
   const AccScreen({super.key});
@@ -78,7 +79,7 @@ class _AccScreenState extends State<AccScreen> {
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
-                  height: 200,
+                  height: 250, // Hauteur ajustée pour la section
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: _filteredLivres.length,
@@ -87,50 +88,106 @@ class _AccScreenState extends State<AccScreen> {
                       return GestureDetector(
                         onTap: () => _showDetails(livre),
                         child: Container(
-                          width: 140,
-                          margin: const EdgeInsets.only(right: 10),
-                          child: Card(
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(12),
-                                    topRight: Radius.circular(12),
+                          width: 160, // Largeur fixe des cartes
+                          margin: const EdgeInsets.only(right: 12),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                            color: Colors.white,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Image avec coins arrondis
+                              ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(16),
+                                  topRight: Radius.circular(16),
+                                ),
+                                child: Image.file(
+                                  File(livre.photo),
+                                  height:
+                                      120, // Taille ajustée pour éviter le débordement
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+
+                              // Titre
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  livre.titre,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
                                   ),
-                                  child: Image.file(
-                                    File(livre.photo),
-                                    height: 120,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+
+                              // Informations supplémentaires
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  'ISBN: ${livre.isbn}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  child: Text(
-                                    livre.titre,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  'Date: ${livre.dateSortie}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+
+                              const Spacer(), // Espace flexible pour pousser le bouton en bas
+
+                              // Bouton "Voir plus"
+
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton.icon(
+                                  onPressed: () => _showDetails(livre),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    foregroundColor: Colors.white,
+                                    minimumSize:
+                                        const Size(double.infinity, 20),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
+                                  icon: const Icon(Icons.visibility),
+                                  label: const Text('Voir plus'),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       );
                     },
                   ),
-                ),
+                )
               ],
             ),
           ),
@@ -227,73 +284,6 @@ class _AccScreenState extends State<AccScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class LivreSearchDelegate extends SearchDelegate {
-  final List<Livre> livres;
-  final Function(Livre) onSelected;
-
-  LivreSearchDelegate(this.livres, this.onSelected);
-
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: const Icon(Icons.clear),
-        onPressed: () => query = '',
-      ),
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.arrow_back),
-      onPressed: () => close(context, null),
-    );
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    final results = livres.where((livre) {
-      final titreLower = livre.titre.toLowerCase();
-      final searchLower = query.toLowerCase();
-      return titreLower.contains(searchLower);
-    }).toList();
-
-    return ListView.builder(
-      itemCount: results.length,
-      itemBuilder: (context, index) {
-        final livre = results[index];
-        return ListTile(
-          title: Text(livre.titre),
-          subtitle: Text('ISBN: ${livre.isbn}'),
-          onTap: () => onSelected(livre),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    final suggestions = livres.where((livre) {
-      final titreLower = livre.titre.toLowerCase();
-      final searchLower = query.toLowerCase();
-      return titreLower.contains(searchLower);
-    }).toList();
-
-    return ListView.builder(
-      itemCount: suggestions.length,
-      itemBuilder: (context, index) {
-        final livre = suggestions[index];
-        return ListTile(
-          title: Text(livre.titre),
-          subtitle: Text('ISBN: ${livre.isbn}'),
-          onTap: () => onSelected(livre),
-        );
-      },
     );
   }
 }
